@@ -18,12 +18,28 @@ model User {
   phone String?
   image String?
   queue Queue? @relation(name: "Queue")
-  repertiore Song[] @relation(name: "Repertiore")
+  repertiore Request[] @relation(name: "Repertiore")
   venues Venue[] @relation(name: "Venues")
   tips Tip[] @relation(name: "Tipper")
   receivedTips Tip[] @relation(name: "Recipient")
+  events Event[] @relation(name: "Event")
 }
 
+model Event {
+  id String @id @default(uuid())
+  address String
+  city String
+  state String
+  zip String
+  pointOfContact String
+  phone String
+  email String
+  time DateTime 
+  eventNotes String
+  setList Request[] @relation(name: "Setlist")
+  artist User @relation(name: "Event", fields: [artistId], references: [id])
+  artistId String @unique 
+}
 
 
 model Tip {
@@ -35,6 +51,8 @@ model Tip {
   tippedAt DateTime @default(now())
   tipper User @relation(name: "Tipper", fields: [userId], references: [id], onDelete: Cascade)
   recipient User @relation(name: "Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+  request Request? @relation(name: "Request", fields: [requestId], references: [id])
+  requestId String @unique
 
   @@id([userId, recipientId])
   @@index([userId])
@@ -56,17 +74,21 @@ model Queue {
   id String @id @default(uuid())
   artist User @relation(name: "Queue", fields: [userId], references: [id])
   userId String @unique
-  songs Song[]
+  requests Request[]
 }
 
-model Song {
+model Request {
   id String @id @default(uuid())
   title String
   originalArtist String?
   sungBy String?
+  notes String
   queues Queue[]
   reps User @relation(name: "Repertiore", fields: [repId], references: [id])
   repId String @unique
+  tip Tip? @relation(name: "Request")
+  event Event? @relation(name: "Setlist", fields: [eventId], references: [id])
+  eventId String @unique 
 }
 
 
