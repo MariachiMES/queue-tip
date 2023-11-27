@@ -9,3 +9,64 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id String @id @default(uuid())
+  name String
+  email String @unique
+  isArtist Boolean @default(true)
+  phone String?
+  image String?
+  queue Queue? @relation(name: "Queue")
+  repertiore Song[] @relation(name: "Repertiore")
+  venues Venue[] @relation(name: "Venues")
+  tips Tip[] @relation(name: "Tipper")
+  receivedTips Tip[] @relation(name: "Recipient")
+}
+
+
+
+model Tip {
+  userId String
+  recipientId String
+  paid Boolean @default(false)
+  amount String
+  accepted Boolean @default(false)
+  tippedAt DateTime @default(now())
+  tipper User @relation(name: "Tipper", fields: [userId], references: [id], onDelete: Cascade)
+  recipient User @relation(name: "Recipient", fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@id([userId, recipientId])
+  @@index([userId])
+  @@index([recipientId])
+}
+
+model Venue {
+  id String @id @default(uuid())
+  artist User @relation(name: "Venues", fields: [artistId], references: [id])
+  artistId String
+  name String
+  address String
+  city String
+  state String
+  zip String?
+}
+
+model Queue {
+  id String @id @default(uuid())
+  artist User @relation(name: "Queue", fields: [userId], references: [id])
+  userId String @unique
+  songs Song[]
+}
+
+model Song {
+  id String @id @default(uuid())
+  title String
+  originalArtist String?
+  sungBy String?
+  queues Queue[]
+  reps User @relation(name: "Repertiore", fields: [repId], references: [id])
+  repId String @unique
+}
+
+
