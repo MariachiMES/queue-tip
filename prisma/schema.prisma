@@ -1,13 +1,14 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+generator client {
+  provider = "prisma-client-js"
 }
 
 model User {
@@ -35,7 +36,7 @@ model Event {
   phone String
   email String
   time DateTime 
-  eventNotes String
+  eventNotes String?
   setList Request[] @relation(name: "Setlist")
   artist User @relation(name: "Event", fields: [artistId], references: [id])
   artistId String @unique 
@@ -82,7 +83,7 @@ model Request {
   title String
   originalArtist String?
   sungBy String?
-  notes String
+  notes String?
   queues Queue[]
   reps User @relation(name: "Repertiore", fields: [repId], references: [id])
   repId String @unique
